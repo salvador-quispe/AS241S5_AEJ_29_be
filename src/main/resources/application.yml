@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://ep-ancient-bread-ami7c8mk-pooler.c-5.us-east-1.aws.neon.tech/generador?sslmode=require&channel_binding=require
+    username: neondb_owner
+    password: npg_zm5bPdG9ujoC
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Swagger UI: http://localhost:8080/swagger-ui.html
+# API Docs:   http://localhost:8080/v3/api-docs
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+rapidapi:
+  key: 6c24a42bdemsh8ee142e9f2ececbp16d671jsndc3e60c45d52
+  tts:
+    host: open-ai-text-to-speech1.p.rapidapi.com
+    url: https://open-ai-text-to-speech1.p.rapidapi.com/
+  email:
+    host: validect-email-verification-v1.p.rapidapi.com
+    url: https://validect-email-verification-v1.p.rapidapi.com/v1/verify
