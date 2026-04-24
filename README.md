@@ -1,95 +1,87 @@
-¿1) README.md (pegar tal cual en tu repo salvador-quispe-AS241S5_AEJ_29-be)
-Markdown
 # salvador-quispe-AS241S5_AEJ_29-be
 
-Microservicio reactivo con **Spring WebFlux** que consume 2 APIs de IA desde RapidAPI, persiste resultados en **PostgreSQL (SQL)** y **MongoDB (NoSQL)** en la nube, y expone endpoints para consultarlos.
+Microservicio reactivo con **Spring WebFlux** que consume 2 APIs de IA desde RapidAPI, persiste resultados en **PostgreSQL (Neon)** en la nube, y expone endpoints documentados con Swagger.
 
-## ✅ APIs de IA utilizadas
+## Stack
 
-### 1) OpenAI Text-to-Speech (Swift API)
-- **Proveedor**: Swift API (vía RapidAPI)
-- **Tipo**: IA – Text-to-Speech
-- **Endpoint base**: `https://open-ai-text-to-speech1.p.rapidapi.com`
-- **Método**: `POST /text-to-speech`
-- **Headers**:
-    - `X-RapidAPI-Key: ${RAPIDAPI_KEY}`
-    - `X-RapidAPI-Host: open-ai-text-to-speech1.p.rapidapi.com`
-- **Request (JSON)**:
-{ "text": "Hola, esto es una prueba", "voice": "en-US-1" }
+- Java 17 + Spring Boot 3.4.4 (WebFlux / Netty)
+- R2DBC + PostgreSQL (Neon Cloud)
+- Docker + Kubernetes
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
 
-Code
-- **Respuesta**: `audio/mpeg` (MP3) o JSON con URL/base64
-- **Uso**: enviar texto → recibir audio → guardar metadata/binario
-- **Notas**: cuota RapidAPI, latencia ~1-3 s, límite de texto
+## APIs de IA utilizadas
 
-### 2) Validect Email Verification
-- **Proveedor**: PM Tech (Validect) – RapidAPI
-- **Tipo**: Validación de correos
-- **Endpoint base**: `https://validect-email-verification.p.rapidapi.com`
-- **Método**: `GET /v1/validate?email={email}`
-- **Headers**:
-    - `X-RapidAPI-Key: ${RAPIDAPI_KEY}`
-    - `X-RapidAPI-Host: validect-email-verification.p.rapidapi.com`
-- **Respuesta (ejemplo)**:
-{ "email":"test@example.com","valid":true,"disposable":false,"role":false,"free":true,"score":0.92 }
+### 1. OpenAI Text-to-Speech (RapidAPI)
+- **Host**: `open-ai-text-to-speech1.p.rapidapi.com`
+- **Método**: `POST /`
+- **Endpoint local**: `POST /api/tts/generate`
 
-Code
-- **Uso**: validar email → guardar `valid, disposable, score` en BD
-- **Notas**: respetar rate limit, no spam
+### 2. Validect Email Verification (RapidAPI)
+- **Host**: `validect-email-verification-v1.p.rapidapi.com`
+- **Método**: `GET /v1/verify?email={email}`
+- **Endpoint local**: `POST /api/email/verify`
 
-## 🧰 Herramientas y versiones
-- **Java**: 17 (Temurin)
-- **Spring Boot**: 3.3.x (WebFlux 6.1.x)
-- **Persistencia**:
-    - SQL: PostgreSQL (R2DBC) – Neon/Supabase/Railway
-    - NoSQL: MongoDB Atlas (reactive)
-- **Build**: Gradle 8.8 (o Maven 3.9)
-- **Contenedor**: Docker (`eclipse-temurin:17-jre-alpine`)
+## Imagen Docker
 
-## ▶️ Ejecutar
-./gradlew bootRun
+```
+docker pull salvaqc/salvador-quispe-genvideo:latest
+```
 
-o
-./mvnw spring-boot:run
+## Despliegue en Kubernetes
 
-Code
+```bash
+kubectl apply -f manifest-salvador-quispe/salvador-quispe-29-namespace.yml
+kubectl apply -f manifest-salvador-quispe/salvador-quispe-29-secret.yml
+kubectl apply -f manifest-salvador-quispe/salvador-quispe-29-service.yml
+kubectl apply -f manifest-salvador-quispe/salvador-quispe-29-deployment.yml
+```
 
-## 🔐 Configuración
-Ver `src/main/resources/application.yml`. Todas las credenciales se leen desde variables de entorno.
-2) src/main/resources/application.yml (credenciales centralizadas)
-YAML
-spring:
-  application:
-    name: as241s5-aej-29-be
-  r2dbc:
-    url: r2dbc:postgresql://${PG_HOST}:${PG_PORT}/${PG_DB}
-    username: ${PG_USER}
-    password: ${PG_PASS}
-  data:
-    mongodb:
-      uri: ${MONGO_URI} # mongodb+srv://...
+Acceder via port-forward:
+```bash
+kubectl port-forward -n salvador-quispe-29 deployment/salvador-quispe-29-deployment 8080:8080
+```
 
-rapidapi:
-  key: ${RAPIDAPI_KEY}
+---
 
-ai:
-  tts:
-    base-url: https://open-ai-text-to-speech1.p.rapidapi.com
-    host: open-ai-text-to-speech1.p.rapidapi.com
-    timeout-ms: 15000
-  email:
-    base-url: https://validect-email-verification.p.rapidapi.com
-    host: validect-email-verification.p.rapidapi.com
-    timeout-ms: 15000
+## Demo de dependencia del Secret (video de entrega)
 
-server:
-  port: 8080
-3) Endpoints sugeridos (para el video y pruebas)
-POST /api/tts → body { "text": "...", "voice": "en-US-1" } → guarda metadata en PostgreSQL y devuelve URL/bytes.
-GET /api/verify?email=... → valida y guarda resultado en MongoDB.
-GET /api/results/sql y GET /api/results/nosql → listar lo guardado.
-Para dejarlo 100% listo, pásame:
-Tu usuario de GitHub (para poner la URL exacta del repo).
-El número final ## (ya usé 29 por tu título).
-Qué proveedor cloud usarás para Postgres (Neon/Supabase/Railway) y la URI de Mongo Atlas (o dejo placeholders).
-Si prefieres Gradle o Maven (te dejo el build.gradle/pom.xml con dependencias).
+### INICIO — Levantar el port-forward
+```bash
+kubectl port-forward -n salvador-quispe-29 deployment/salvador-quispe-29-deployment 8080:8080
+```
+> Dejar corriendo en una terminal y abrir `http://localhost:8080/swagger-ui.html`
+
+### PARTE 1 — Verificar que funciona
+```bash
+kubectl get all -n salvador-quispe-29
+kubectl get pods -n salvador-quispe-29
+```
+
+### PARTE 2 — Eliminar secret y deployment
+```bash
+kubectl delete -f manifest-salvador-quispe/salvador-quispe-29-secret.yml
+kubectl delete -f manifest-salvador-quispe/salvador-quispe-29-deployment.yml
+```
+
+### PARTE 3 — Crear solo el deployment (sin secret)
+```bash
+kubectl apply -f manifest-salvador-quispe/salvador-quispe-29-deployment.yml
+```
+
+### PARTE 4 — Mostrar que falla
+```bash
+kubectl get pods -n salvador-quispe-29
+kubectl describe pod -n salvador-quispe-29
+```
+> El pod queda en estado `CreateContainerConfigError` por dependencia del secret eliminado.
+
+### PARTE 5 — Restaurar todo
+```bash
+kubectl apply -f manifest-salvador-quispe/salvador-quispe-29-secret.yml
+kubectl apply -f manifest-salvador-quispe/salvador-quispe-29-deployment.yml
+```
+
+### PARTE 6 — Verificar que funciona de nuevo
+```bash
+kubectl get pods -n salvador-quispe-29
+```

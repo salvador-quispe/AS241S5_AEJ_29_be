@@ -10,8 +10,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/email")
@@ -23,19 +23,14 @@ public class EmailVerifyController {
 
     @PostMapping("/verify")
     @Operation(summary = "Verificar email", description = "Devuelve si el email es válido o no")
-    public ResponseEntity<EmailResponse> verify(@Valid @RequestBody EmailVerifyRequest request) {
-        return ResponseEntity.ok(
-            ResponseMapper.toEmailResponse(apiService.verifyEmail(request.getEmail()))
-        );
+    public Mono<ResponseEntity<EmailResponse>> verify(@Valid @RequestBody EmailVerifyRequest request) {
+        return apiService.verifyEmail(request.getEmail())
+            .map(result -> ResponseEntity.ok(ResponseMapper.toEmailResponse(result)));
     }
 
     @GetMapping("/history")
     @Operation(summary = "Historial de verificaciones")
-    public ResponseEntity<List<EmailResponse>> history() {
-        return ResponseEntity.ok(
-            apiService.obtenerPorTipo("email-verify").stream()
-                .map(ResponseMapper::toEmailResponse)
-                .toList()
-        );
+    public Flux<EmailResponse> history() {
+        return apiService.obtenerPorTipo("email-verify").map(ResponseMapper::toEmailResponse);
     }
 }
