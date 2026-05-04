@@ -7,8 +7,8 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 
-@Data
 @Table("api_requests")
+@Data
 public class ApiRequest {
 
     @Id
@@ -25,7 +25,7 @@ public class ApiRequest {
     @Column("result_data")
     private String resultData;
 
-    private String status = "pending";
+    private String status = "pending";  // processing | completed | error | deleted
 
     @Column("created_at")
     private LocalDateTime createdAt;

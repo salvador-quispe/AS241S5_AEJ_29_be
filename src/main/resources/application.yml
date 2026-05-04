@@ -3,28 +3,31 @@ server:
 
 spring:
   r2dbc:
-    url: ${R2DBC_URL:r2dbc:postgresql://ep-ancient-bread-ami7c8mk-pooler.c-5.us-east-1.aws.neon.tech/generador}
-    username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
-    password: ${SPRING_DATASOURCE_PASSWORD:npg_zm5bPdG9ujoC}
-    properties:
-      sslMode: require
+    url: r2dbc:postgresql://ep-ancient-bread-ami7c8mk-pooler.c-5.us-east-1.aws.neon.tech/generador?sslMode=require
+    username: neondb_owner
+    password: npg_zm5bPdG9ujoC
+  datasource:
+    url: jdbc:postgresql://ep-ancient-bread-ami7c8mk-pooler.c-5.us-east-1.aws.neon.tech/generador?sslmode=require
+    username: neondb_owner
+    password: npg_zm5bPdG9ujoC
   sql:
     init:
       mode: always
+      schema-locations: classpath:schema.sql
 
+# Swagger UI: http://localhost:8080/swagger-ui.html
+# API Docs:   http://localhost:8080/v3/api-docs
 springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
-    url: /v3/api-docs
-    config-url: /v3/api-docs/swagger-config
 
 rapidapi:
-  key: ${RAPIDAPI_KEY:6c24a42bdemsh8ee142e9f2ececbp16d671jsndc3e60c45d52}
+  key: 6c24a42bdemsh8ee142e9f2ececbp16d671jsndc3e60c45d52
   tts:
-    host: ${RAPIDAPI_TTS_HOST:open-ai-text-to-speech1.p.rapidapi.com}
-    url: ${RAPIDAPI_TTS_URL:https://open-ai-text-to-speech1.p.rapidapi.com/}
+    host: open-ai-text-to-speech1.p.rapidapi.com
+    url: https://open-ai-text-to-speech1.p.rapidapi.com/
   email:
-    host: ${RAPIDAPI_EMAIL_HOST:validect-email-verification-v1.p.rapidapi.com}
-    url: ${RAPIDAPI_EMAIL_URL:https://validect-email-verification-v1.p.rapidapi.com/v1/verify}
+    host: validect-email-verification-v1.p.rapidapi.com
+    url: https://validect-email-verification-v1.p.rapidapi.com/v1/verify

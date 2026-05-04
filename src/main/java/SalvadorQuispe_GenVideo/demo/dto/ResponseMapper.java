@@ -12,8 +12,9 @@ public class ResponseMapper {
         TtsResponse r = new TtsResponse();
         r.setId(req.getId());
         r.setRequestUuid(req.getRequestUuid());
-        r.setStatus(req.getStatus());
         r.setCreatedAt(req.getCreatedAt());
+        r.setActive(!"deleted".equals(req.getStatus()));
+        r.setResult(req.getStatus()); // completed | error | processing
 
         // Extraer input/model/voice del inputData
         try {
@@ -23,7 +24,7 @@ public class ResponseMapper {
             r.setVoice(input.path("voice").asText());
         } catch (Exception ignored) {}
 
-        // URL de descarga si está completado
+        // URL de descarga directa usando el uuid
         if ("completed".equals(req.getStatus())) {
             r.setDownloadUrl("/api/tts/" + req.getRequestUuid() + "/audio");
         }
@@ -35,8 +36,8 @@ public class ResponseMapper {
         EmailResponse r = new EmailResponse();
         r.setId(req.getId());
         r.setRequestUuid(req.getRequestUuid());
-        r.setStatus(req.getStatus());
         r.setCreatedAt(req.getCreatedAt());
+        r.setActive(!"deleted".equals(req.getStatus()));
 
         // Extraer email del inputData
         try {
@@ -44,19 +45,34 @@ public class ResponseMapper {
             r.setEmail(input.path("email").asText());
         } catch (Exception ignored) {}
 
-        // Extraer resultado de la verificación
-        try {
-            JsonNode result = mapper.readTree(req.getResultData());
-            // Validect devuelve { "status": "valid"/"invalid", "reason": "..." }
-            String emailStatus = result.path("status").asText();
-            r.setValid("valid".equalsIgnoreCase(emailStatus));
-            r.setStatus(emailStatus.isEmpty() ? req.getStatus() : emailStatus);
+        // Intentar leer resultado desde result_data (registros nuevos)
+        boolean resolvedFromJson = false;
+        if (req.getResultData() != null && !req.getResultData().isBlank()) {
+            try {
+                JsonNode result = mapper.readTree(req.getResultData());
+                String apiStatus = result.path("status").asText("");
+                if (!apiStatus.isEmpty()) {
+                    r.setResult(apiStatus);
+                    r.setValid("valid".equalsIgnoreCase(apiStatus));
+                    resolvedFromJson = true;
+                }
+                if (result.has("reason"))       r.setReason(result.path("reason").asText());
+                else if (result.has("message")) r.setReason(result.path("message").asText());
+                else if (result.has("error"))   r.setReason(result.path("error").asText());
+            } catch (Exception ignored) {}
+        }
 
-            // Buscar razón en varios campos posibles
-            if (result.has("reason"))       r.setReason(result.path("reason").asText());
-            else if (result.has("message")) r.setReason(result.path("message").asText());
-            else if (result.has("error"))   r.setReason(result.path("error").asText());
-        } catch (Exception ignored) {}
+        // Fallback: registros viejos que tienen "valid"/"invalid" directo en status
+        if (!resolvedFromJson) {
+            String s = req.getStatus();
+            if ("valid".equalsIgnoreCase(s) || "invalid".equalsIgnoreCase(s)) {
+                r.setResult(s);
+                r.setValid("valid".equalsIgnoreCase(s));
+            } else {
+                r.setResult(s); // "processing" | "error" | "deleted"
+                r.setValid(false);
+            }
+        }
 
         return r;
     }
