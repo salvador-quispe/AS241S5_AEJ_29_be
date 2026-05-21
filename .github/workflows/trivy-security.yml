@@ -25,12 +25,33 @@ jobs:
       - name: Build Docker image
         run: docker build -t as241s5_aej_29-be .
 
-      - name: Run Trivy Scanner
-        uses: aquasecurity/trivy-action@master
+      # ── Scan 1: tabla legible en los logs ──────────────────────────────────
+      - name: Run Trivy Scanner (table)
+        uses: aquasecurity/trivy-action@0.30.0
         with:
           image-ref: 'as241s5_aej_29-be'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
-          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+          severity: 'HIGH,CRITICAL'
+          trivyignores: '.trivyignore'
+
+      # ── Scan 2: reporte SARIF para GitHub Security tab ────────────────────
+      - name: Run Trivy Scanner (SARIF)
+        uses: aquasecurity/trivy-action@0.30.0
+        if: always()
+        with:
+          image-ref: 'as241s5_aej_29-be'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'HIGH,CRITICAL'
+          trivyignores: '.trivyignore'
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'

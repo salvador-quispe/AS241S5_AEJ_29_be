@@ -1,0 +1,8 @@
+# .trivyignore
+# CVEs sin fix disponible en Alpine / temurin JRE.
+# Revisar periódicamente si ya tienen parche publicado.
+#
+# Formato: un CVE por línea (opcionalmente con comentario)
+#
+# Ejemplo (descomentar si Trivy los reporta como unfixed):
+# CVE-2023-XXXXX
