@@ -27,7 +27,7 @@ jobs:
 
       # ── Scan 1: tabla legible en los logs ──────────────────────────────────
       - name: Run Trivy Scanner (table)
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: 'as241s5_aej_29-be'
           format: 'table'
@@ -39,7 +39,7 @@ jobs:
 
       # ── Scan 2: reporte SARIF para GitHub Security tab ────────────────────
       - name: Run Trivy Scanner (SARIF)
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@v0.36.0
         if: always()
         with:
           image-ref: 'as241s5_aej_29-be'
