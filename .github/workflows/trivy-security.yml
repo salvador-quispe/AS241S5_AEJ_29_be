@@ -1,0 +1,36 @@
+name: Trivy Security Scan
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build project
+        run: mvn clean package -DskipTests
+
+      - name: Build Docker image
+        run: docker build -t as241s5_aej_29-be .
+
+      - name: Run Trivy Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'as241s5_aej_29-be'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
