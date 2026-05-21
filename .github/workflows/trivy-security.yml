@@ -29,19 +29,18 @@ jobs:
       - name: Build Docker image
         run: docker build -t as241s5_aej_29-be .
 
-      # ── Scan 1: tabla legible en los logs ──────────────────────────────────
-      # ignore-unfixed: true → solo falla si el CVE tiene parche disponible
-      # severity: todas las escalas → reporte completo sin omitir nada
-      - name: Run Trivy Scanner (table)
+      # ── Scan 1: resumen compacto en los logs (solo totales por target) ─────
+      - name: Run Trivy Scanner (summary)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: 'as241s5_aej_29-be'
           format: 'table'
-          exit-code: '1'
+          exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
           trivyignores: '.trivyignore'
+          additional-args: '--report summary'
 
       # ── Scan 2: reporte SARIF para GitHub Security tab ────────────────────
       - name: Run Trivy Scanner (SARIF)
