@@ -29,31 +29,33 @@ jobs:
       - name: Build Docker image
         run: docker build -t as241s5_aej_29-be .
 
-      # ── Scan 1: resumen compacto en los logs (solo totales por target) ─────
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.70.0
+
+      # ── Scan 1: solo el resumen (una fila por target, sin listar cada jar) ─
       - name: Run Trivy Scanner (summary)
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: 'as241s5_aej_29-be'
-          format: 'table'
-          exit-code: '0'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
-          trivyignores: '.trivyignore'
-          additional-args: '--report summary'
+        run: |
+          trivy image \
+            --format table \
+            --report summary \
+            --ignore-unfixed \
+            --vuln-type os,library \
+            --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL \
+            --ignorefile .trivyignore \
+            as241s5_aej_29-be
 
       # ── Scan 2: reporte SARIF para GitHub Security tab ────────────────────
       - name: Run Trivy Scanner (SARIF)
-        uses: aquasecurity/trivy-action@v0.36.0
-        if: always()
-        with:
-          image-ref: 'as241s5_aej_29-be'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
-          trivyignores: '.trivyignore'
+        run: |
+          trivy image \
+            --format sarif \
+            --output trivy-results.sarif \
+            --ignore-unfixed \
+            --vuln-type os,library \
+            --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL \
+            --ignorefile .trivyignore \
+            as241s5_aej_29-be
 
       - name: Upload SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v4
