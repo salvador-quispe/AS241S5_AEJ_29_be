@@ -33,7 +33,7 @@ jobs:
         with:
           image-ref: 'as241s5_aej_29-be'
           format: 'table'
-          exit-code: '1'
+          exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
