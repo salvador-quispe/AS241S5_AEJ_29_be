@@ -9,11 +9,11 @@ COPY target/*.jar app.jar
 RUN java -Djarmode=layertools -jar app.jar extract
 
 # ── Stage 2: runtime ─────────────────────────────────────────────────────────
-# eclipse-temurin:21-jre-alpine es la imagen más pequeña y con menos CVEs:
-#   - Sin Ubuntu → elimina las 14 vulnerabilidades del OS
-#   - JRE en lugar de JDK → superficie de ataque reducida
-#   - Alpine → sin pebble ni herramientas innecesarias
+# eclipse-temurin:21-jre-alpine: imagen mínima, sin Ubuntu, sin pebble
 FROM eclipse-temurin:21-jre-alpine
+
+# Actualizar paquetes del OS Alpine para eliminar CVEs del sistema base
+RUN apk update && apk upgrade --no-cache
 
 # Crear usuario no-root para no ejecutar como root
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup

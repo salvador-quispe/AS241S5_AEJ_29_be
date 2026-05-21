@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.4</version>
+		<version>3.5.0</version>
 		<relativePath/>
 	</parent>
 	<groupId>SalvadorQuispe-GenVideo</groupId>
@@ -13,6 +13,9 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<properties>
 		<java.version>21</java.version>
+		<!-- Forzar versiones sin CVEs conocidos, sobreescribiendo las del BOM de Spring Boot -->
+		<netty.version>4.1.121.Final</netty.version>
+		<logback.version>1.5.18</logback.version>
 	</properties>
 	<dependencies>
 		<!-- WebFlux reactivo -->
@@ -25,6 +28,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+			<version>42.7.11</version>
 			<scope>runtime</scope>
 		</dependency>
 
