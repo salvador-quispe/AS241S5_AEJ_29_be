@@ -15,7 +15,10 @@
 		<java.version>21</java.version>
 		<!-- Forzar versiones sin CVEs conocidos, sobreescribiendo las del BOM de Spring Boot -->
 		<netty.version>4.1.122.Final</netty.version>
-		<logback.version>1.5.32</logback.version>
+		<logback.version>1.5.18</logback.version>
+		<snakeyaml.version>2.3</snakeyaml.version>
+		<jackson-bom.version>2.18.3</jackson-bom.version>
+		<reactor-bom.version>2024.0.5</reactor-bom.version>
 	</properties>
 	<dependencies>
 		<!-- WebFlux reactivo -->

@@ -9,14 +9,9 @@ COPY target/*.jar app.jar
 RUN java -Djarmode=layertools -jar app.jar extract
 
 # ── Stage 2: runtime ─────────────────────────────────────────────────────────
-# eclipse-temurin:21-jre-alpine: imagen mínima, sin Ubuntu, sin pebble
-FROM eclipse-temurin:21-jre-alpine
-
-# Actualizar paquetes del OS Alpine para eliminar CVEs del sistema base
-RUN apk update && apk upgrade --no-cache
-
-# Crear usuario no-root para no ejecutar como root
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# gcr.io/distroless/java21-debian12: imagen sin shell, sin paquetes OS innecesarios
+# → superficie de ataque mínima, prácticamente 0 CVEs del OS
+FROM gcr.io/distroless/java21-debian12:nonroot
 
 WORKDIR /app
 
@@ -26,11 +21,7 @@ COPY --from=builder /build/spring-boot-loader/ ./
 COPY --from=builder /build/snapshot-dependencies/ ./
 COPY --from=builder /build/application/ ./
 
-# Cambiar propietario al usuario no-root
-RUN chown -R appuser:appgroup /app
-
-USER appuser
-
+# distroless:nonroot ya corre como usuario no-root (uid 65532)
 EXPOSE 8080
 
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
