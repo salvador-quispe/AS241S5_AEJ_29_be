@@ -1,25 +1,12 @@
 # .trivyignore
-# CVEs ignorados porque:
-#   (a) no tienen fix disponible upstream (will_not_fix / affected)
-#   (b) son falsos positivos de Trivy en versiones ya parcheadas
+# CVEs sin fix disponible en la rama Spring Boot 3.5.x actualmente publicada.
 # Revisar periódicamente si ya tienen parche publicado.
-#
-# NOTA: El pipeline escanea solo --vuln-type library para el reporte de tabla.
-#       Los CVEs del OS van al SARIF de GitHub Security pero no bloquean el build.
 
-# ── logback (CVE-2025-11226 fix: >= 1.5.19, CVE-2026-1225 fix: >= 1.5.25) ──
-# Ya forzamos logback.version=1.5.25 en pom.xml → ignorar si Trivy reporta
-# versión transitiva antigua
+# ── spring-boot (fix: 3.5.14 — no publicado aún) ─────────────────────────────
+# Arbitrary Code Execution via predictable temp file names (DevTools)
+# Solo afecta si spring-boot-devtools está en classpath de producción (no es nuestro caso)
+CVE-2026-40973
+
+# ── logback (ya corregido con logback.version=1.5.25) ────────────────────────
 CVE-2025-11226
 CVE-2026-1225
-
-# ── commons-lang3 (LOW, sin fix disponible en 3.17.0) ───────────────────────
-CVE-2024-26308
-
-# ── jackson-core (falso positivo en 2.18.x) ─────────────────────────────────
-CVE-2022-42003
-CVE-2022-42004
-
-# ── spring-boot / spring-framework (CVEs sin fix en rama 3.5.x / 6.2.x) ────
-# CVE-2026-22737 afecta script template views (no usamos Groovy/JRuby templates)
-CVE-2026-22737
