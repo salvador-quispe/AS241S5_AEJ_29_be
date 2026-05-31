@@ -33,20 +33,20 @@ jobs:
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.70.0
 
-      # ── Scan: solo muestra el resumen en los logs ─────────────────────────
+      # ── Scan: solo librerías Java (donde controlamos las versiones) ────────
       - name: Run Trivy Scanner
         run: |
           trivy image \
             --format table \
             --report summary \
             --ignore-unfixed \
-            --vuln-type os,library \
+            --vuln-type library \
             --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL \
             --ignorefile .trivyignore \
             --exit-code 0 \
             as241s5_aej_29-be
 
-      # ── Genera SARIF en silencio para GitHub Security tab ─────────────────
+      # ── Genera SARIF completo (OS + library) para GitHub Security tab ──────
       - name: Generate SARIF report
         run: |
           trivy image \
