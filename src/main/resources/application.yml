@@ -3,13 +3,13 @@ server:
 
 spring:
   r2dbc:
-    url: r2dbc:postgresql://ep-ancient-bread-ami7c8mk-pooler.c-5.us-east-1.aws.neon.tech/generador?sslMode=require
-    username: neondb_owner
-    password: npg_zm5bPdG9ujoC
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://ep-shy-frog-apvf5d3z.c-7.us-east-1.aws.neon.tech/neondb?sslMode=require}
+    username: ${SPRING_R2DBC_USERNAME:neondb_owner}
+    password: ${SPRING_R2DBC_PASSWORD:npg_7HL4OkWszFBI}
   datasource:
-    url: jdbc:postgresql://ep-ancient-bread-ami7c8mk-pooler.c-5.us-east-1.aws.neon.tech/generador?sslmode=require
-    username: neondb_owner
-    password: npg_zm5bPdG9ujoC
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://ep-shy-frog-apvf5d3z.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require}
+    username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
+    password: ${SPRING_DATASOURCE_PASSWORD:npg_7HL4OkWszFBI}
   sql:
     init:
       mode: always
@@ -24,10 +24,13 @@ springdoc:
     path: /swagger-ui.html
 
 rapidapi:
-  key: 6c24a42bdemsh8ee142e9f2ececbp16d671jsndc3e60c45d52
+  key: ${RAPIDAPI_KEY:6c24a42bdemsh8ee142e9f2ececbp16d671jsndc3e60c45d52}
   tts:
     host: open-ai-text-to-speech1.p.rapidapi.com
     url: https://open-ai-text-to-speech1.p.rapidapi.com/
   email:
     host: validect-email-verification-v1.p.rapidapi.com
     url: https://validect-email-verification-v1.p.rapidapi.com/v1/verify
+
+
+#hola

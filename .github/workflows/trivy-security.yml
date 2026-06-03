@@ -33,14 +33,14 @@ jobs:
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.70.0
 
-      # ── Scan: solo tabla resumen (una fila por target con el conteo) ────────
+      # ── Scan: reporte nativo Trivy con Total al final ─────────────────────
       - name: Run Trivy Scanner
         run: |
           trivy image \
             --format table \
-            --table-mode summary \
             --ignore-unfixed \
-            --vuln-type library \
+            --pkg-types library \
+            --scanners vuln \
             --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL \
             --ignorefile .trivyignore \
             --exit-code 0 \
